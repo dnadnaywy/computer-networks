@@ -1,5 +1,5 @@
 # computer-networks
-2nd year - project
+2nd year, 1st semester - project
 
 Mersul trenurilor - proiect de A
 
