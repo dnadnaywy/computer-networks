@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<trainList>
+	<train nr="2">
+		<type>RR</type>
+		<id>1977</id>
+		<stationList>
+			<station>
+				<stationName>Klaipeda</stationName>
+				<arrivalTime>
+					<hour>10</hour>
+					<minutes>09</minutes>
+				</arrivalTime>
+				<departureTime>
+					<hour>10</hour>
+					<minutes>09</minutes>
+				</departureTime>
+				<delayDeparture>0</delayDeparture>
+				<delayArrival>0</delayArrival>
+				<earlyArrival>42</earlyArrival>
+			</station>
+			<station>
+				<stationName>Frasinu</stationName>
+				<arrivalTime>
+					<hour>14</hour>
+					<minutes>46</minutes>
+				</arrivalTime>
+				<departureTime>
+					<hour>14</hour>
+					<minutes>56</minutes>
+				</departureTime>
+				<delayDeparture>0</delayDeparture>
+				<delayArrival>0</delayArrival>
+				<earlyArrival>42</earlyArrival>
+			</station>
+			<station>
+				<stationName>Vaslui</stationName>
+				<arrivalTime>
+					<hour>15</hour>
+					<minutes>10</minutes>
+				</arrivalTime>
+				<departureTime>
+					<hour>15</hour>
+					<minutes>10</minutes>
+				</departureTime>
+				<delayDeparture>0</delayDeparture>
+				<delayArrival>0</delayArrival>
+				<earlyArrival>42</earlyArrival>
+			</station>
+		</stationList>
+	</train>
+</trainList>

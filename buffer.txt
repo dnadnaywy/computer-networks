@@ -1,0 +1,227 @@
+ /*getline(&buffer, &len_buffer, fd);
+    getline(&buffer, &len_buffer, fd);
+    if (strstr(buffer, "<station>") != NULL)
+    {
+      getline(&buffer, &len_buffer, fd); /*asta e linia cu station name, deci iau numele de aici
+      j = 0;
+      for (int i = 17; buffer[i] != '<'; i++, j++)
+        stationName[j] = buffer[i];
+      stationName[strlen(stationName)] = '\0';
+    }*/
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+while (strstr(buffer, "</train>") != 0) /*nu am ajuns la finalul train ului*/
+      {
+        printf("AM AJUNS INTR-O STATION\n");
+        if (strcmp(buffer, "<station>") == 0) station=1;
+        if (station==1)
+        {
+          /*deci sunt intr-un tag <station>*/
+          //printf("SUNT IN TAG STATION\n");
+          ct++;
+          station=0;
+        }
+        getline(&buffer, &len_buffer, fd);
+      }
+
+
+
+/*!!!!!!!deci: PT CE SE GASESTE CU FINDCITY, DE PUNE UN ENDL LA FINAL. AM COD CARE REZOLVA CHESTIA ASTA. DAR SA NU UIT!!*/
+
+
+/*un exemplu cu un tren din xml*/
+
+<train nr="3">
+		<type>IR</type>
+		<id>1884</id>
+		<stationList>
+			<station>
+				<stationName>Bucuresti Nord</stationName>
+				<arrivalTime>
+					<hour>06</hour>
+					<minutes>09</minutes>
+				</arrivalTime>
+				<departureTime>
+					<hour>06</hour>
+					<minutes>09</minutes>
+				</departureTime>
+				<delayDeparture>0</delayDeparture> <!-- aici este un comenatiru -->
+				<delayArrival>0</delayArrival>
+				<earlyArrival>0</earlyArrival>
+			</station>
+			<station>
+				<stationName>Ploiesti Vest</stationName>
+				<arrivalTime>
+					<hour>06</hour>
+					<minutes>46</minutes>
+				</arrivalTime>
+				<departureTime>
+					<hour>06</hour>
+					<minutes>48</minutes>
+				</departureTime>
+				<delayDeparture>0</delayDeparture> <!-- aici este un comenatiru -->
+				<delayArrival>0</delayArrival>
+				<earlyArrival>0</earlyArrival>			
+			</station>
+			<station>Campina</station>
+			<station>Comarnic</station>
+			<station>Valea Larga Hm</station>
+			<station>Sinaia</station>
+			<station>Busteni</station>
+			<station>Azuga</station>
+			<station>Predeal</station>
+			<station>Brasov</station>
+			<station>Augustin</station>
+			<station>Racos</station>
+			<station>Rupea</station>
+			<station>Vanatori</station>
+			<station>Sighisoara</station>
+			<station>Dumbraveni</station>
+			<station>Medias</station>
+			<station>Copsa Mica</station>
+			<station>Blaj</station>
+			<station>Teius</station>
+			<station>Aiud</station>
+			<station>Razboieni</station>
+			<station>Campia Turzii</station>
+			<station>Cluj-Napoca</station>
+		</stationList>
+	</train>
+  /*sfarsit cu exemplul din xml*/
+
+
+  void searchXmlTwoStations(int statieSosire, int statiePlecare, char mesaj[500])
+{
+  /*initializez mesajul de trimis catre client cu ""*/
+  strcpy(mesaj,"");
+  FILE *fd;
+  char type[10] = "", id[10] = "";
+  fd = fopen("trenuri.xml", "r");
+
+  char *buffer = NULL, *copieSosire = NULL, *copiePlecare = NULL;
+  size_t len_buffer = 0;
+  bool ok = 0, stationSosire = 0, stationPlecare = 0; /*ok e pt cand am gasit un type si id; station e pt cand am gasit un tag <station>*/
+  bool okStationName = 0, okArrivalTime = 0, okDepartureTime = 0; /*toate astea sunt pt a afisa toate info corecte cand compar verifStatie cu stationName*/
+  int j, ct = 0;
+  char stationNamePlecare[100] = "", arrivalTimePlecare[10] = "", departureTimePlecare[10] = "";
+  char stationNameSosire[100] = "", arrivalTimeSosire[10] = "", departureTimeSosire[10] = "";
+  char verifStatieSosire[100] = "", verifStatiePlecare[100] = ""; /*din statie, care e nr, gasim numele luat din orase.txt si apoi salvam in verifStatie*/
+  copieSosire=findCity(statieSosire);
+  copiePlecare=findCity(statiePlecare);
+  strncpy(verifStatieSosire,copieSosire,strlen(copieSosire)-1);
+  strncpy(verifStatiePlecare,copiePlecare,strlen(copiePlecare)-1);
+  //printf("verifStatie: %s; strlen(verifStatie): %d;\n",verifStatie,strlen(verifStatie));
+
+  getline(&buffer, &len_buffer, fd); // parsing the xml until discovering the category
+  while (strcmp(buffer, "</trainList>") != 0)
+  {
+    // parsing the xml until discovering the category
+    getline(&buffer, &len_buffer, fd);
+    if (strstr(buffer, "<type>") != NULL)
+    {
+      strncpy(type, buffer + 8, 2);
+      getline(&buffer, &len_buffer, fd);
+      strncpy(id, buffer + 6, 4);
+      getline(&buffer, &len_buffer, fd);
+      ok = 1;
+    }
+    if (ok == 1)
+    {
+      //printf("AM AJUNS INTR-UN TRAIN\n"); /*am ajuns intr-un train*/
+      strcpy(stationName,""); strcpy(arrivalTime,""); strcpy(departureTime,"");
+      okStationName = 0; okArrivalTime = 0; okDepartureTime = 0;
+      while (strstr(buffer, "</train>") == NULL)
+      {
+        if (strstr(buffer, "<station>") != 0)
+        {
+          station = 1; /*AM AJUNS INTR-O STATION*/
+        }
+        if (station == 1)
+        {
+          station = 0;
+          while (strstr(buffer, "</station>") == NULL) /*nu ajung la finalul unui station*/
+          {
+            if (strstr(buffer, "<stationName>") != 0)
+            {
+              /*deci gasesc stationName aici*/
+              /*prelucrare stationName*/
+              okArrivalTime=0;okDepartureTime=0;
+              j = 0;
+              char aux[100] = "";
+              for (int i = 17; buffer[i] != '<'; i++, j++)
+                aux[j] = buffer[i];
+              aux[strlen(aux)] = '\0';
+              strcpy(stationName, aux);
+              okStationName=1;
+              // printf("Am gasit numele statiei: %s.\n",stationName);
+            }
+            if (strstr(buffer, "<arrivalTime>") != 0)
+            {
+              /*gasesc arrivalTime; prelucrarea arrivalTime*/
+              okArrivalTime=1;
+              getline(&buffer, &len_buffer, fd); /*acum suntem la linia cu hour*/
+              j = 0;
+              char aux[100] = "";
+              for (int i = 11; buffer[i] != '<'; i++, j++)
+                aux[j] = buffer[i];
+              aux[strlen(aux)] = '\0';
+              strcpy(arrivalTime, aux);
+
+              getline(&buffer, &len_buffer, fd); /*acum suntem la linia cu minutes*/
+              j = 0;
+              strcpy(aux, "");
+              for (int i = 14; buffer[i] != '<'; i++, j++)
+                aux[j] = buffer[i];
+              aux[strlen(aux)] = '\0';
+              strcat(arrivalTime, ":");
+              strcat(arrivalTime, aux); /*concatenez minutele la ore*/
+              //printf("Am gasit arrivalTime si stationName: %s in %s.\n", arrivalTime, stationName);
+            }
+            if (strstr(buffer, "<departureTime>") != 0) /*gasesc departureTime; prelucrarea departureTime*/
+            {
+              okDepartureTime=1;
+              getline(&buffer, &len_buffer, fd); /*acum suntem la linia cu hour*/
+              j = 0;
+              char aux[100] = "";
+              for (int i = 11; buffer[i] != '<'; i++, j++)
+                aux[j] = buffer[i];
+              aux[strlen(aux)] = '\0';
+              strcpy(departureTime, aux);
+
+              getline(&buffer, &len_buffer, fd); /*acum suntem la linia cu minutes*/
+              j = 0;
+              strcpy(aux, "");
+              for (int i = 14; buffer[i] != '<'; i++, j++)
+                aux[j] = buffer[i];
+              aux[strlen(aux)] = '\0';
+              strcat(departureTime, ":");
+              strcat(departureTime, aux); /*concatenez minutele la ore*/
+              //printf("Am gasit departureTime si stationName: %s in %s.\n", departureTime, stationName);
+            }
+            if (strcmp(verifStatie,stationName)==0 && okStationName == 1 && okArrivalTime == 1 && okDepartureTime == 1)
+            {
+              /*inseamna ca am gasit statia ceruta de client*/
+              printf("Trenul %s%s ajunge in %s la ora %s si pleaca la ora %s.\n",type, id, stationName, arrivalTime, departureTime);
+              strcat(mesaj,"Trenul "); strcat(mesaj,type); strcat(mesaj,id); strcat(mesaj," ajunge in ");
+              strcat(mesaj,stationName); strcat(mesaj," la ora "); strcat(mesaj,arrivalTime);
+              strcat(mesaj," si pleaca la ora "); strcat(mesaj,departureTime);    strcat(mesaj,".\n");
+              okStationName = 0; okArrivalTime = 0; okDepartureTime = 0;
+            }
+            getline(&buffer, &len_buffer, fd);
+          }
+        }
+        getline(&buffer, &len_buffer, fd);
+      }
+
+      // printf("contorul este: %d\n",ct);
+    }
+    if (ok == 1)
+    {
+      //printf("type, id: %s, %s\n", type, id);
+      ok = 0;
+    }
+  }
+  // printf("[LINE 327]A IESIT DIN WHILE\n");
+  fclose(fd);
+}
